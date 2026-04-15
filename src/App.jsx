@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import './App.css'
+import styles from './Header.module.css'
 
-function Header() {
+function Header({ mode }) {
   const title = "Favour's Profile";
-  const subtitle = "Lab 5: ";
+  const subtitle = "Lab 6: Conditional Rendering and Styling";
 
-  return ( <header> 
+  return ( 
+  <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}> 
    <h1>{title}</h1>
    <h2>{subtitle}</h2>
    </header>
@@ -26,12 +28,15 @@ function Introduction() {
   );
 }
 
+
+
 function App() {
   // <select value={selectedTitle} onChange={(e) => setTitle(e.target.value)}>
   // <input value={searchName} onChange={(e) => setName(e.target.value)} />
 
   
   // const [name , setName ]
+  const [mode, setMode] = useState("light")
   const [selectedTitle, setTitle ] = useState(""); //dropdown
   const [searchName, setName ] = useState(""); //search
   const cards = [
@@ -69,8 +74,17 @@ function App() {
   // <Component prop={item.prop} /> ))
   return (
     <div> 
-      <Header />
+      <Header mode={mode} />
       <Introduction />
+
+<button onClick={() => setMode(mode === "light" ? "dark" : "light")}>
+  {mode === "light" ? "☀️" : "🌚"}
+</button>
+
+<p>
+  {mode === "light" ? "Light Mode Active" : "Dark Mode Active"}
+</p>
+
       <select value={selectedTitle} onChange={(e) => setTitle(e.target.value)}>
         <option value="">All</option>
         <option value= "Student">Student</option>
