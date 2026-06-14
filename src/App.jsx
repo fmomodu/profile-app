@@ -1,3 +1,5 @@
+import ProfileLayout from './pages/ProfileLayout'
+import ProfileDetails from './pages/ProfileDetails'
 import { HashRouter, Routes, Route, Link } from 'react-router-dom'
 import Home from './pages/Home'
 import AddProfile from './pages/AddProfile'
@@ -21,6 +23,9 @@ function App() {
         <Route path="/add-profile" element={<AddProfile />} />
         <Route path="/about" element={<About />} />
         <Route path="/other-profiles" element={<OtherProfiles />} />
+        <Route path="/profiles" element={<ProfileLayout />}>
+  <Route path=":id" element={<ProfileDetails />} />
+</Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </HashRouter>

@@ -4,7 +4,7 @@ import styles from '../Header.module.css'
 
 function Header({ mode }) {
   const title = "Favour's Profile";
-  const subtitle = "Lab 6: Conditional Rendering and Styling";
+  const subtitle = "Lab 10: Dynamic and Nested Routes";
 
   return ( 
   <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}> 
