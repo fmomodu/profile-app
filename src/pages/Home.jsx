@@ -1,17 +1,23 @@
-import { useState } from 'react'
-import { useMode } from '../context/ModeContext';
+import {
+  useState,
+  useReducer,
+  useRef,
+  useLayoutEffect
+} from 'react'
+
+import { useMode } from '../context/ModeContext'
 import '../App.css'
 import styles from '../Header.module.css'
 
 function Header({ mode }) {
   const title = "Favour's Profile";
-  const subtitle = "Lab 11: Mode Context";
+  const subtitle = "Lab 12: Scaling State Management in Your Application";
 
-  return ( 
-  <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}> 
-   <h1>{title}</h1>
-   <h2>{subtitle}</h2>
-   </header>
+  return (
+    <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}>
+      <h1>{title}</h1>
+      <h2>{subtitle}</h2>
+    </header>
   );
 }
 
@@ -21,7 +27,7 @@ function Introduction() {
   const email = "fmomodu@purdue.edu";
 
   return (
-    <section> 
+    <section>
       <h2>{name}</h2>
       <p>{bio}</p>
       <p>{email}</p>
@@ -29,80 +35,118 @@ function Introduction() {
   );
 }
 
-
-
 function Home() {
   const { mode, toggleMode } = useMode()
-  const [selectedTitle, setTitle ] = useState(""); //dropdown
-  const [searchName, setName ] = useState(""); //search
+
+  const initialState = {
+    selectedTitle: "",
+    searchName: ""
+  }
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case "SET_TITLE":
+        return { ...state, selectedTitle: action.value }
+
+      case "SET_SEARCH":
+        return { ...state, searchName: action.value }
+
+      case "RESET":
+        return initialState
+
+      default:
+        return state
+    }
+  }
+
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  const searchRef = useRef(null)
+  const sectionRef = useRef(null)
+
+  const [cardCount, setCardCount] = useState(0)
+
+  useLayoutEffect(() => {
+    if (sectionRef.current) {
+      setCardCount(sectionRef.current.children.length)
+    }
+  }, [state.selectedTitle, state.searchName])
+
   const cards = [
     {
       id: 1,
-      name: "Favour", 
+      name: "Favour",
       title: "Student",
-      year: "Senior", 
-      major: "IT", 
+      year: "Senior",
+      major: "IT",
       isFeatured: true
     },
     {
       id: 2,
-      name: "Ngozi", 
+      name: "Ngozi",
       title: "Professor",
-      year: "Junior", 
-      major: "Cybersecurity", 
+      year: "Junior",
+      major: "Cybersecurity",
       isFeatured: false
     }
   ]
 
   const filteredCards = cards.filter((card) => {
-    const matchesTitle = 
-    selectedTitle === "" || card.title === selectedTitle;
+    const matchesTitle =
+      state.selectedTitle === "" || card.title === state.selectedTitle
 
-    const matchesSearch = 
-    searchName === "" ||
-    card.name.toLowerCase().includes(searchName.toLowerCase());
-    return matchesTitle && matchesSearch;
-  });
-  
+    const matchesSearch =
+      state.searchName === "" ||
+      card.name.toLowerCase().includes(state.searchName.toLowerCase())
 
+    return matchesTitle && matchesSearch
+  })
 
-  // array.map((item) => (
-  // <Component prop={item.prop} /> ))
   return (
-    <div className={`home-page ${mode === "light" ? "home-light" : "home-dark"}`}> 
+    <div className={`home-page ${mode === "light" ? "home-light" : "home-dark"}`}>
       <Header mode={mode} />
       <Introduction />
 
-<button onClick={toggleMode}>
-  {mode === "light" ? "☀️" : "🌚"}
-</button>
+      <button onClick={toggleMode}>
+        {mode === "light" ? "☀️" : "🌚"}
+      </button>
 
-<p>
-  {mode === "light" ? "Light Mode Active" : "Dark Mode Active"}
-</p>
+      <p>
+        {mode === "light" ? "Light Mode Active" : "Dark Mode Active"}
+      </p>
 
-      <select value={selectedTitle} onChange={(e) => setTitle(e.target.value)}>
+      <p>Showing {cardCount} profiles</p>
+
+      <select
+        value={state.selectedTitle}
+        onChange={(e) =>
+          dispatch({ type: "SET_TITLE", value: e.target.value })
+        }
+      >
         <option value="">All</option>
-        <option value= "Student">Student</option>
+        <option value="Student">Student</option>
         <option value="Professor">Professor</option>
         <option value="Faculty">Faculty</option>
-        </select>
+      </select>
 
-      <input 
-        value={searchName} 
-        onChange={(e) => setName(e.target.value)} 
+      <input
+        ref={searchRef}
+        value={state.searchName}
+        onChange={(e) =>
+          dispatch({ type: "SET_SEARCH", value: e.target.value })
+        }
         placeholder="Search by name"
-        />
+      />
 
-      <button onClick={() => {
-        setName("");
-        setTitle("");
-      }}>
+      <button onClick={() => searchRef.current.focus()}>
+        Focus
+      </button>
+
+      <button onClick={() => dispatch({ type: "RESET" })}>
         Reset
-        </button>  
+      </button>
 
-
-      <Section>
+      <Section ref={sectionRef}>
         {filteredCards.map((card) => (
           <Card
             key={card.id}
@@ -114,33 +158,25 @@ function Home() {
           />
         ))}
       </Section>
-    
     </div>
   );
 }
-function Section({ children}) {
-    return (
-      <section>
-        {children}
-      </section>
-    )
-  }
-  
 
-// function Component({ thing1, thing2 }) {
-// return <p>{thing1}</p> }
-function Card({name,title, year, major, isFeatured}) {
+import { forwardRef } from 'react'
+
+const Section = forwardRef(function Section({ children }, ref) {
+  return <section ref={ref}>{children}</section>
+})
+
+function Card({ name, title, year, major, isFeatured }) {
   return (
-    // condition ? "if true" : "if false"
-    // with {variable}, without is text 
-    <div className={isFeatured? "card featured" : "card"}> 
-      <h3>{name}</h3>  
+    <div className={isFeatured ? "card featured" : "card"}>
+      <h3>{name}</h3>
       <p>{title}</p>
       <p>{year}</p>
-      <p>{major}</p> 
+      <p>{major}</p>
     </div>
   )
-
 }
-export default Home;
 
+export default Home
