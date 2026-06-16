@@ -1,3 +1,4 @@
+import { ModeProvider } from './context/ModeContext'
 import ProfileLayout from './pages/ProfileLayout'
 import ProfileDetails from './pages/ProfileDetails'
 import { HashRouter, Routes, Route, Link } from 'react-router-dom'
@@ -11,6 +12,9 @@ import './App.css'
 function App() {
   return (
     <HashRouter>
+      <ModeProvider>
+
+      
       <nav>
         <Link to="/">Home</Link>
         <Link to="/add-profile">Add Profile</Link>
@@ -28,6 +32,7 @@ function App() {
 </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </ModeProvider>
     </HashRouter>
   )
 }

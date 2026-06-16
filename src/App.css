@@ -67,3 +67,17 @@ button:hover {
 .featured {
   border: 3px solid #8b1e3f;
 }
+
+.home-page {
+  min-height: 100vh;
+}
+
+.home-light {
+  background: #f7d7dd;
+  color: #b78d8d;
+}
+
+.home-dark {
+  background: #961c38;
+  color: #420808;
+}

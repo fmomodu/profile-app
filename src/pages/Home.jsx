@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { useMode } from '../context/ModeContext';
 import '../App.css'
 import styles from '../Header.module.css'
 
 function Header({ mode }) {
   const title = "Favour's Profile";
-  const subtitle = "Lab 10: Dynamic and Nested Routes";
+  const subtitle = "Lab 11: Mode Context";
 
   return ( 
   <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}> 
@@ -16,7 +17,7 @@ function Header({ mode }) {
 
 function Introduction() {
   const name = "Favour";
-  const bio = "blah blah blah";
+  const bio = "Web Programming Student at Purdue University";
   const email = "fmomodu@purdue.edu";
 
   return (
@@ -31,12 +32,7 @@ function Introduction() {
 
 
 function Home() {
-  // <select value={selectedTitle} onChange={(e) => setTitle(e.target.value)}>
-  // <input value={searchName} onChange={(e) => setName(e.target.value)} />
-
-  
-  // const [name , setName ]
-  const [mode, setMode] = useState("light")
+  const { mode, toggleMode } = useMode()
   const [selectedTitle, setTitle ] = useState(""); //dropdown
   const [searchName, setName ] = useState(""); //search
   const cards = [
@@ -73,11 +69,11 @@ function Home() {
   // array.map((item) => (
   // <Component prop={item.prop} /> ))
   return (
-    <div> 
+    <div className={`home-page ${mode === "light" ? "home-light" : "home-dark"}`}> 
       <Header mode={mode} />
       <Introduction />
 
-<button onClick={() => setMode(mode === "light" ? "dark" : "light")}>
+<button onClick={toggleMode}>
   {mode === "light" ? "☀️" : "🌚"}
 </button>
 
