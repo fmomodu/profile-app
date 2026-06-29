@@ -1,21 +1,19 @@
 import {
-  useState,
-  useReducer,
   useRef,
-  useLayoutEffect,
-  useMemo,
   useCallback,
   memo,
   forwardRef
 } from 'react'
 
 import { useMode } from '../context/ModeContext'
+import useProfileFilter from '../hooks/useProfileFilter'
+import useCardCount from '../hooks/useCardCount'
 import '../App.css'
 import styles from '../Header.module.css'
 
 const Header = memo(function Header({ mode }) {
   const title = "Favour's Profile";
-  const subtitle = "Lab 13: Performance Optimization";
+  const subtitle = "Lab 14: Custom Hooks";
 
   return (
     <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}>
@@ -42,86 +40,23 @@ const Introduction = memo(function Introduction() {
 function Home() {
   const { mode, toggleMode } = useMode()
 
-  const initialState = {
-    selectedTitle: "",
-    searchName: ""
-  }
+  const {
+    state,
+    filteredCards,
+    handleTitleChange,
+    handleSearchChange,
+    handleReset
+  } = useProfileFilter()
 
-  function reducer(state, action) {
-    switch (action.type) {
-      case "SET_TITLE":
-        return { ...state, selectedTitle: action.value }
-
-      case "SET_SEARCH":
-        return { ...state, searchName: action.value }
-
-      case "RESET":
-        return initialState
-
-      default:
-        return state
-    }
-  }
-
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const {
+    sectionRef,
+    cardCount
+  } = useCardCount(filteredCards)
 
   const searchRef = useRef(null)
-  const sectionRef = useRef(null)
-
-  const [cardCount, setCardCount] = useState(0)
-
-  const cards = useMemo(() => [
-    {
-      id: 1,
-      name: "Favour",
-      title: "Student",
-      year: "Senior",
-      major: "IT",
-      isFeatured: true
-    },
-    {
-      id: 2,
-      name: "Ngozi",
-      title: "Professor",
-      year: "Junior",
-      major: "Cybersecurity",
-      isFeatured: false
-    }
-  ], [])
-
-  const filteredCards = useMemo(() => {
-    return cards.filter((card) => {
-      const matchesTitle =
-        state.selectedTitle === "" || card.title === state.selectedTitle
-
-      const matchesSearch =
-        state.searchName === "" ||
-        card.name.toLowerCase().includes(state.searchName.toLowerCase())
-
-      return matchesTitle && matchesSearch
-    })
-  }, [cards, state.selectedTitle, state.searchName])
-
-  useLayoutEffect(() => {
-    if (sectionRef.current) {
-      setCardCount(sectionRef.current.children.length)
-    }
-  }, [filteredCards])
-
-  const handleTitleChange = useCallback((e) => {
-    dispatch({ type: "SET_TITLE", value: e.target.value })
-  }, [])
-
-  const handleSearchChange = useCallback((e) => {
-    dispatch({ type: "SET_SEARCH", value: e.target.value })
-  }, [])
 
   const handleFocus = useCallback(() => {
     searchRef.current.focus()
-  }, [])
-
-  const handleReset = useCallback(() => {
-    dispatch({ type: "RESET" })
   }, [])
 
   return (
