@@ -1,0 +1,1 @@
+import{j as e}from"./index-G6ATnGSl.js";function s(){return e.jsxs("div",{children:[e.jsx("h1",{children:"Other Profiles"}),e.jsx("p",{children:"This page displays other profile examples."})]})}export{s as default};

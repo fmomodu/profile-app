@@ -1,0 +1,1 @@
+import{u as a,j as t,O as e}from"./index-G6ATnGSl.js";function i(){const s=a();return t.jsxs("div",{children:[t.jsx("button",{onClick:()=>s(-1),children:"Go Back"}),t.jsx(e,{})]})}export{i as default};

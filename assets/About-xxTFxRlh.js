@@ -1,1 +1,0 @@
-import{j as t}from"./index-D9vtXsDF.js";function s(){return t.jsxs("div",{children:[t.jsx("h1",{children:"About"}),t.jsx("p",{children:"This profile app was updated to use multiple pages with React Router."})]})}export{s as default};

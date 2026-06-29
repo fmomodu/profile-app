@@ -1,1 +1,0 @@
-import{j as e}from"./index-D9vtXsDF.js";function i(){return e.jsxs("div",{children:[e.jsx("h1",{children:"Add Profile"}),e.jsx("p",{children:"This page will allow users to add a new profile."})]})}export{i as default};
