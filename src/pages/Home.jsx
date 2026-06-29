@@ -2,16 +2,20 @@ import {
   useState,
   useReducer,
   useRef,
-  useLayoutEffect
+  useLayoutEffect,
+  useMemo,
+  useCallback,
+  memo,
+  forwardRef
 } from 'react'
 
 import { useMode } from '../context/ModeContext'
 import '../App.css'
 import styles from '../Header.module.css'
 
-function Header({ mode }) {
+const Header = memo(function Header({ mode }) {
   const title = "Favour's Profile";
-  const subtitle = "Lab 12: Scaling State Management in Your Application";
+  const subtitle = "Lab 13: Performance Optimization";
 
   return (
     <header className={`${styles.header} ${mode === "light" ? styles.light : styles.dark}`}>
@@ -19,9 +23,9 @@ function Header({ mode }) {
       <h2>{subtitle}</h2>
     </header>
   );
-}
+})
 
-function Introduction() {
+const Introduction = memo(function Introduction() {
   const name = "Favour";
   const bio = "Web Programming Student at Purdue University";
   const email = "fmomodu@purdue.edu";
@@ -33,7 +37,7 @@ function Introduction() {
       <p>{email}</p>
     </section>
   );
-}
+})
 
 function Home() {
   const { mode, toggleMode } = useMode()
@@ -66,13 +70,7 @@ function Home() {
 
   const [cardCount, setCardCount] = useState(0)
 
-  useLayoutEffect(() => {
-    if (sectionRef.current) {
-      setCardCount(sectionRef.current.children.length)
-    }
-  }, [state.selectedTitle, state.searchName])
-
-  const cards = [
+  const cards = useMemo(() => [
     {
       id: 1,
       name: "Favour",
@@ -89,18 +87,42 @@ function Home() {
       major: "Cybersecurity",
       isFeatured: false
     }
-  ]
+  ], [])
 
-  const filteredCards = cards.filter((card) => {
-    const matchesTitle =
-      state.selectedTitle === "" || card.title === state.selectedTitle
+  const filteredCards = useMemo(() => {
+    return cards.filter((card) => {
+      const matchesTitle =
+        state.selectedTitle === "" || card.title === state.selectedTitle
 
-    const matchesSearch =
-      state.searchName === "" ||
-      card.name.toLowerCase().includes(state.searchName.toLowerCase())
+      const matchesSearch =
+        state.searchName === "" ||
+        card.name.toLowerCase().includes(state.searchName.toLowerCase())
 
-    return matchesTitle && matchesSearch
-  })
+      return matchesTitle && matchesSearch
+    })
+  }, [cards, state.selectedTitle, state.searchName])
+
+  useLayoutEffect(() => {
+    if (sectionRef.current) {
+      setCardCount(sectionRef.current.children.length)
+    }
+  }, [filteredCards])
+
+  const handleTitleChange = useCallback((e) => {
+    dispatch({ type: "SET_TITLE", value: e.target.value })
+  }, [])
+
+  const handleSearchChange = useCallback((e) => {
+    dispatch({ type: "SET_SEARCH", value: e.target.value })
+  }, [])
+
+  const handleFocus = useCallback(() => {
+    searchRef.current.focus()
+  }, [])
+
+  const handleReset = useCallback(() => {
+    dispatch({ type: "RESET" })
+  }, [])
 
   return (
     <div className={`home-page ${mode === "light" ? "home-light" : "home-dark"}`}>
@@ -119,9 +141,7 @@ function Home() {
 
       <select
         value={state.selectedTitle}
-        onChange={(e) =>
-          dispatch({ type: "SET_TITLE", value: e.target.value })
-        }
+        onChange={handleTitleChange}
       >
         <option value="">All</option>
         <option value="Student">Student</option>
@@ -132,17 +152,15 @@ function Home() {
       <input
         ref={searchRef}
         value={state.searchName}
-        onChange={(e) =>
-          dispatch({ type: "SET_SEARCH", value: e.target.value })
-        }
+        onChange={handleSearchChange}
         placeholder="Search by name"
       />
 
-      <button onClick={() => searchRef.current.focus()}>
+      <button onClick={handleFocus}>
         Focus
       </button>
 
-      <button onClick={() => dispatch({ type: "RESET" })}>
+      <button onClick={handleReset}>
         Reset
       </button>
 
@@ -162,13 +180,11 @@ function Home() {
   );
 }
 
-import { forwardRef } from 'react'
-
-const Section = forwardRef(function Section({ children }, ref) {
+const Section = memo(forwardRef(function Section({ children }, ref) {
   return <section ref={ref}>{children}</section>
-})
+}))
 
-function Card({ name, title, year, major, isFeatured }) {
+const Card = memo(function Card({ name, title, year, major, isFeatured }) {
   return (
     <div className={isFeatured ? "card featured" : "card"}>
       <h3>{name}</h3>
@@ -177,6 +193,6 @@ function Card({ name, title, year, major, isFeatured }) {
       <p>{major}</p>
     </div>
   )
-}
+})
 
 export default Home
